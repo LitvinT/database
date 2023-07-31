@@ -27,7 +27,7 @@ def upload_user_excel_file(request):
             return render(request, 'user_excel.html')
 
         try:
-            df = pd.read_excel(excel_file)
+            df = pd.read_excel(excel_file, dtype={'phone': str, 'whatsapp_link': str})
         except Exception as e:
             return render(request, 'user_excel.html', {'error': f'Ошибка при чтении файла: {e}'})
 
