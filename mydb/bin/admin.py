@@ -120,16 +120,66 @@ def create_csv_company(self, request, queryset):
     return response
 
 
+class HasValueFilter(admin.SimpleListFilter):
+    def lookups(self, request, model_admin):
+        return (
+            ('yes', 'Yes'),
+            ('no', 'No'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'yes':
+            return queryset.exclude(**{f'{self.parameter_name}__exact': ''})
+        if self.value() == 'no':
+            return queryset.filter(**{f'{self.parameter_name}__exact': ''})
+        return queryset
+
+class WhatsappLinkFilter(HasValueFilter):
+    title = 'Has Whatsapp Link'
+    parameter_name = 'whatsapp_link'
+
+class EmailFilter(HasValueFilter):
+    title = 'Has Email'
+    parameter_name = 'email'
+
+class PhoneFilter(HasValueFilter):
+    title = 'Has Phone'
+    parameter_name = 'phone'
+
+class InstagramLinkFilter(HasValueFilter):
+    title = 'Has Instagram Link'
+    parameter_name = 'instagram_link'
+
+class TwitterLinkFilter(HasValueFilter):
+    title = 'Has Twitter Link'
+    parameter_name = 'twitter_link'
+
+class VKLinkFilter(HasValueFilter):
+    title = 'Has VK Link'
+    parameter_name = 'vk_link'
+
+class FacebookLinkFilter(HasValueFilter):
+    title = 'Has Facebook Link'
+    parameter_name = 'facebook_link'
+
+class LinkedInLinkFilter(HasValueFilter):
+    title = 'Has LinkedIn Link'
+    parameter_name = 'linkedin_link'
+
+class TelegramLinkFilter(HasValueFilter):
+    title = 'Has Telegram Link'
+    parameter_name = 'telegram_link'
+
+
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = (
         'id', 'name', 'country', 'email', 'phone', 'login_bitmain', 'telegram_link', 'instagram_link', 'twitter_link',
         'vk_link', 'facebook_link', 'linkedin_link', 'whatsapp_link', 'counter', 'feedback'
     )
-    list_filter = (
-        'telegram_link', 'instagram_link', 'twitter_link', 'vk_link', 'facebook_link', 'linkedin_link', 'whatsapp_link',
-        'country', 'counter'
-    )
+    list_filter = (WhatsappLinkFilter, EmailFilter, PhoneFilter, InstagramLinkFilter, TwitterLinkFilter,
+        VKLinkFilter, FacebookLinkFilter, LinkedInLinkFilter, TelegramLinkFilter, 'country')
+
     search_fields = ('id',)
     actions = (create_excel_user, create_csv_user)
     list_editable = ('counter', 'feedback')
