@@ -3,9 +3,10 @@ from datetime import datetime
 
 import openpyxl
 from django.contrib import admin
+from django.db import transaction
 from django.http import HttpResponse
 
-from .models import User, Company
+from .models import User, Company, UpdateLog
 
 
 @admin.action(description='Выгрузить Excel')
@@ -120,6 +121,13 @@ def create_csv_company(self, request, queryset):
     return response
 
 
+def undo_last_upload(modeladmin, request, queryset):
+    last_uploaded_users = User.objects.filter(created_by_upload=True).order_by('-id')[:queryset.count()]
+    last_uploaded_users.delete()
+
+undo_last_upload.short_description = "Отменить последнюю загрузку пользователей"
+
+
 class HasValueFilter(admin.SimpleListFilter):
     def lookups(self, request, model_admin):
         return (
@@ -134,59 +142,79 @@ class HasValueFilter(admin.SimpleListFilter):
             return queryset.filter(**{f'{self.parameter_name}__exact': ''})
         return queryset
 
+
 class WhatsappLinkFilter(HasValueFilter):
     title = 'Has Whatsapp Link'
     parameter_name = 'whatsapp_link'
+
 
 class EmailFilter(HasValueFilter):
     title = 'Has Email'
     parameter_name = 'email'
 
+
 class PhoneFilter(HasValueFilter):
     title = 'Has Phone'
     parameter_name = 'phone'
+
 
 class InstagramLinkFilter(HasValueFilter):
     title = 'Has Instagram Link'
     parameter_name = 'instagram_link'
 
+
 class TwitterLinkFilter(HasValueFilter):
     title = 'Has Twitter Link'
     parameter_name = 'twitter_link'
+
 
 class VKLinkFilter(HasValueFilter):
     title = 'Has VK Link'
     parameter_name = 'vk_link'
 
+
 class FacebookLinkFilter(HasValueFilter):
     title = 'Has Facebook Link'
     parameter_name = 'facebook_link'
+
 
 class LinkedInLinkFilter(HasValueFilter):
     title = 'Has LinkedIn Link'
     parameter_name = 'linkedin_link'
 
+
 class TelegramLinkFilter(HasValueFilter):
     title = 'Has Telegram Link'
     parameter_name = 'telegram_link'
+
 
 class FeedbackFilter(HasValueFilter):
     title = 'Has Feedback'
     parameter_name = 'feedback'
 
 
+class CounterFilter(HasValueFilter):
+    title = 'Has Counter'
+    parameter_name = 'counter'
+
+
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
+
     list_display = (
         'id', 'name', 'country', 'email', 'phone', 'login_bitmain', 'telegram_link', 'instagram_link', 'twitter_link',
         'vk_link', 'facebook_link', 'linkedin_link', 'whatsapp_link', 'counter', 'feedback'
     )
     list_filter = (WhatsappLinkFilter, EmailFilter, PhoneFilter, InstagramLinkFilter, TwitterLinkFilter,
-        VKLinkFilter, FacebookLinkFilter, LinkedInLinkFilter, TelegramLinkFilter, FeedbackFilter, 'country')
+                   VKLinkFilter, FacebookLinkFilter, LinkedInLinkFilter, TelegramLinkFilter, CounterFilter, FeedbackFilter,
+                   'country')
 
     search_fields = ('id',)
     actions = (create_excel_user, create_csv_user)
     list_editable = ('counter', 'feedback')
+admin.site.register(UpdateLog)
+
+
 
 
 @admin.register(Company)

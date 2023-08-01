@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import numpy as np
 import pandas as pd
 from django.shortcuts import render, redirect, reverse
@@ -12,7 +14,7 @@ from django.contrib.auth.views import LoginView
 from django.contrib.auth.decorators import login_required
 
 from .forms import LoginForm
-from .models import User, Company
+from .models import User, Company, UpdateLog
 from .serializers import UserSerializer, CompanySerializer
 
 
@@ -98,6 +100,9 @@ def upload_user_excel_file(request):
                     user.feedback = feedback
 
                 user.save()
+
+        update_info = "Users updated on {}".format(datetime.now())
+        UpdateLog.objects.create(update_info=update_info)
 
         return redirect(reverse('admin:index'))
 

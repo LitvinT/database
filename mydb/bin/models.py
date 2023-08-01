@@ -27,6 +27,17 @@ class User(models.Model):
         return self.name
 
 
+class UpdateLog(models.Model):
+    timestamp = models.DateTimeField(auto_now_add=True)
+    update_info = models.TextField()
+
+    class Meta:
+        ordering = ['-timestamp']
+
+    def __str__(self):
+        return f"Update at {self.timestamp}"
+
+
 class Company(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=64, verbose_name='name', blank=True)
