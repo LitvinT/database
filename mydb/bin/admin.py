@@ -170,6 +170,10 @@ class TelegramLinkFilter(HasValueFilter):
     title = 'Has Telegram Link'
     parameter_name = 'telegram_link'
 
+class FeedbackFilter(HasValueFilter):
+    title = 'Has Feedback'
+    parameter_name = 'feedback'
+
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
@@ -178,7 +182,7 @@ class UserAdmin(admin.ModelAdmin):
         'vk_link', 'facebook_link', 'linkedin_link', 'whatsapp_link', 'counter', 'feedback'
     )
     list_filter = (WhatsappLinkFilter, EmailFilter, PhoneFilter, InstagramLinkFilter, TwitterLinkFilter,
-        VKLinkFilter, FacebookLinkFilter, LinkedInLinkFilter, TelegramLinkFilter, 'country')
+        VKLinkFilter, FacebookLinkFilter, LinkedInLinkFilter, TelegramLinkFilter, FeedbackFilter, 'country')
 
     search_fields = ('id',)
     actions = (create_excel_user, create_csv_user)
