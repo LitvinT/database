@@ -212,9 +212,6 @@ class UserAdmin(admin.ModelAdmin):
     search_fields = ('id',)
     actions = (create_excel_user, create_csv_user)
     list_editable = ('counter', 'feedback')
-admin.site.register(UpdateLog)
-
-
 
 
 @admin.register(Company)

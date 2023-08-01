@@ -1,4 +1,7 @@
+import json
+
 from django.db import models
+from django.utils import timezone
 
 
 class User(models.Model):
@@ -28,14 +31,13 @@ class User(models.Model):
 
 
 class UpdateLog(models.Model):
-    timestamp = models.DateTimeField(auto_now_add=True)
-    update_info = models.TextField()
-
-    class Meta:
-        ordering = ['-timestamp']
+    update_info = models.CharField(max_length=255)
+    changes_before_update = models.JSONField(default=list)
+    changes_after_update = models.JSONField(default=list)
+    timestamp = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f"Update at {self.timestamp}"
+        return self.update_info
 
 
 class Company(models.Model):

@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from django.shortcuts import render, redirect, reverse
 from django.urls import reverse_lazy
+from django.utils import timezone
 from django.views.generic import TemplateView
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -107,6 +108,31 @@ def upload_user_excel_file(request):
         return redirect(reverse('admin:index'))
 
     return render(request, 'user_excel.html')
+
+
+def rollback_update(request, log_id):
+    try:
+        log = UpdateLog.objects.get(id=log_id)
+        users_before_update = log.changes_before_update
+        for user_data in users_before_update:
+            phone = user_data['phone']
+            user, created = User.objects.get_or_create(phone=phone, defaults=user_data)
+
+            if not created:
+                for field in user_data:
+                    setattr(user, field, user_data[field])
+                user.save()
+
+        log.delete()
+    except UpdateLog.DoesNotExist:
+        pass
+
+    return redirect('view_update_logs')
+
+
+def view_update_logs(request):
+    logs = UpdateLog.objects.all().order_by('-timestamp')
+    return render(request, 'view_update_logs.html', {'logs': logs})
 
 
 def upload_company_excel_file(request):
