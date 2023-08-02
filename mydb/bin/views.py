@@ -3,17 +3,11 @@ from datetime import datetime
 import numpy as np
 import pandas as pd
 from django.shortcuts import render, redirect, reverse
-from django.urls import reverse_lazy
-from django.utils import timezone
-from django.views.generic import TemplateView
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.views import LoginView
-from django.contrib.auth.decorators import login_required
-
 from .forms import LoginForm
 from .models import User, Company, UpdateLog
 from .serializers import UserSerializer, CompanySerializer
@@ -452,3 +446,5 @@ class LoginUserView(LoginView):
     form_class = LoginForm
     template_name = 'bin/index.html'
 
+
+#ricky dicky doo dah grimes boom shakalaka boom shaka

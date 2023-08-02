@@ -125,6 +125,7 @@ def undo_last_upload(modeladmin, request, queryset):
     last_uploaded_users = User.objects.filter(created_by_upload=True).order_by('-id')[:queryset.count()]
     last_uploaded_users.delete()
 
+
 undo_last_upload.short_description = "Отменить последнюю загрузку пользователей"
 
 
@@ -227,3 +228,4 @@ class CompanyAdmin(admin.ModelAdmin):
     search_fields = ('id',)
     actions = (create_excel_company, create_csv_company)
     list_editable = ('counter', 'feedback')
+
