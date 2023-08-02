@@ -1,8 +1,8 @@
 import json
 import requests
 
-url = 'http://127.0.0.1:8000/api/protected/'
-token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjkwNTM4MzAwLCJpYXQiOjE2OTA1MzgwMDAsImp0aSI6ImI0Y2YzZGU5Y2JkMzRmNzdhZmQyNDRjZTIyNWU3YTYxIiwidXNlcl9pZCI6MX0.4TMC-DcPhaB2aH_G-2uYnTctdF23nTtgNVR3OOLQ7S0'
+url = 'http://127.0.0.1:62717/api/v1/users/'
+token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjkwOTg5NDQzLCJpYXQiOjE2OTA5ODkxNDMsImp0aSI6IjNiZDE4ZDM3ZDk4ZDQ0NjY5ZWVhNGM2MjQ1YWRlN2Y1IiwidXNlcl9pZCI6MX0.-iVlTDMS3Cv-CR29k5MY6EbmHGp9g3rcMvn43YFGbg0'
 headers = {'Authorization': f'Bearer {token}'}
 
 response = requests.get(url, headers=headers)
