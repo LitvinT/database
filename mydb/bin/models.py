@@ -1,10 +1,10 @@
-import json
-
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import User
 
 
-class User(models.Model):
+
+class Client(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=64, verbose_name='name', blank=True)
     country = models.CharField(max_length=16, verbose_name='country', blank=True)
@@ -20,11 +20,12 @@ class User(models.Model):
     whatsapp_link = models.CharField(max_length=64, verbose_name='whatsapp_link', blank=True)
     counter = models.CharField(max_length=3, verbose_name='counter', blank=True)
     feedback = models.CharField(max_length=1024, verbose_name='feedback', blank=True)
+    manager = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name='manager', blank=True, null=True)
 
     class Meta:
-        db_table = 'users'
-        verbose_name = 'user'
-        verbose_name_plural = 'users'
+        db_table = 'clients'
+        verbose_name = 'client'
+        verbose_name_plural = 'clients'
 
     def __str__(self):
         return self.name
@@ -57,10 +58,10 @@ class Company(models.Model):
     whatsapp_link = models.CharField(max_length=64, verbose_name='whatsapp_link', blank=True)
     counter = models.CharField(max_length=3, verbose_name='counter', blank=True)
     feedback = models.CharField(max_length=1024, verbose_name='feedback', blank=True)
+    manager = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name='manager', blank=True, null=True)
 
     class Meta:
         db_table = 'company'
         verbose_name = 'сompany'
         verbose_name_plural = 'companies'
-
 

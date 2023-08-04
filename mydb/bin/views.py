@@ -8,24 +8,24 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth.views import LoginView
 from .forms import LoginForm
-from .models import User, Company, UpdateLog
-from .serializers import UserSerializer, CompanySerializer
+from .models import Client, Company, UpdateLog
+from .serializers import ClientSerializer, CompanySerializer
 
 
-def upload_user_excel_file(request):
+def upload_client_excel_file(request):
     if request.method == 'POST':
         if 'excel_file' not in request.FILES:
-            return render(request, 'user_excel.html', {'error': 'Файл не выбран'})
+            return render(request, 'client_excel.html', {'error': 'Файл не выбран'})
 
         excel_file = request.FILES['excel_file']
 
         if not excel_file.name.endswith('.xlsx'):
-            return render(request, 'user_excel.html')
+            return render(request, 'client_excel.html')
 
         try:
             df = pd.read_excel(excel_file, dtype={'phone': str, 'whatsapp_link': str})
         except Exception as e:
-            return render(request, 'user_excel.html', {'error': f'Ошибка при чтении файла: {e}'})
+            return render(request, 'cleint_excel.html', {'error': f'Ошибка при чтении файла: {e}'})
 
         df.replace({np.nan: ''}, inplace=True)
 
@@ -46,7 +46,7 @@ def upload_user_excel_file(request):
             feedback = row.get('feedback', '')
 
             # Создаем пользователя, пропустив создание, если такой номер телефона уже существует
-            user, created = User.objects.get_or_create(
+            client, created = Client.objects.get_or_create(
                 phone=phone,
                 defaults={
                     'name': name,
@@ -66,55 +66,55 @@ def upload_user_excel_file(request):
             )
 
             if not created:
-                if not user.name and name:
-                    user.name = name
-                if not user.country and country:
-                    user.country = country
-                if not user.email and email:
-                    user.email = email
-                if not user.login_bitmain and login_bitmain:
-                    user.login_bitmain = login_bitmain
-                if not user.telegram_link and telegram_link:
-                    user.telegram_link = telegram_link
-                if not user.instagram_link and instagram_link:
-                    user.instagram_link = instagram_link
-                if not user.twitter_link and twitter_link:
-                    user.twitter_link = twitter_link
-                if not user.vk_link and vk_link:
-                    user.vk_link = vk_link
-                if not user.facebook_link and facebook_link:
-                    user.facebook_link = facebook_link
-                if not user.linkedin_link and linkedin_link:
-                    user.linkedin_link = linkedin_link
-                if not user.whatsapp_link and whatsapp_link:
-                    user.whatsapp_link = whatsapp_link
-                if not user.counter and counter:
-                    user.counter = counter
-                if not user.feedback and feedback:
-                    user.feedback = feedback
+                if not client.name and name:
+                    client.name = name
+                if not client.country and country:
+                    client.country = country
+                if not client.email and email:
+                    client.email = email
+                if not client.login_bitmain and login_bitmain:
+                    client.login_bitmain = login_bitmain
+                if not client.telegram_link and telegram_link:
+                    client.telegram_link = telegram_link
+                if not client.instagram_link and instagram_link:
+                    client.instagram_link = instagram_link
+                if not client.twitter_link and twitter_link:
+                    client.twitter_link = twitter_link
+                if not client.vk_link and vk_link:
+                    client.vk_link = vk_link
+                if not client.facebook_link and facebook_link:
+                    client.facebook_link = facebook_link
+                if not client.linkedin_link and linkedin_link:
+                    client.linkedin_link = linkedin_link
+                if not client.whatsapp_link and whatsapp_link:
+                    client.whatsapp_link = whatsapp_link
+                if not client.counter and counter:
+                    client.counter = counter
+                if not client.feedback and feedback:
+                    client.feedback = feedback
 
-                user.save()
+                client.save()
 
-        update_info = "Users updated on {}".format(datetime.now())
+        update_info = "Clients updated on {}".format(datetime.now())
         UpdateLog.objects.create(update_info=update_info)
 
         return redirect(reverse('admin:index'))
 
-    return render(request, 'user_excel.html')
+    return render(request, 'client_excel.html')
 
 
 def rollback_update(request, log_id):
     try:
         log = UpdateLog.objects.get(id=log_id)
-        users_before_update = log.changes_before_update
-        for user_data in users_before_update:
-            phone = user_data['phone']
-            user, created = User.objects.get_or_create(phone=phone, defaults=user_data)
+        clients_before_update = log.changes_before_update
+        for client_data in clients_before_update:
+            phone = client_data['phone']
+            client, created = Client.objects.get_or_create(phone=phone, defaults=client_data)
 
             if not created:
-                for field in user_data:
-                    setattr(user, field, user_data[field])
-                user.save()
+                for field in client_data:
+                    setattr(client, field, client_data[field])
+                client.save()
 
         log.delete()
     except UpdateLog.DoesNotExist:
@@ -162,7 +162,7 @@ def upload_company_excel_file(request):
             counter = row.get('counter', '')
             feedback = row.get('feedback', '')
 
-            user, created = Company.objects.get_or_create(
+            company, created = Company.objects.get_or_create(
                 phone=phone,
                 defaults={
                     'name': name,
@@ -183,36 +183,36 @@ def upload_company_excel_file(request):
             )
 
             if not created:
-                if not user.name and name:
-                    user.name = name
-                if not user.country and country:
-                    user.country = country
-                if not user.email and email:
-                    user.email = email
-                if not user.individual and individual:
-                    user.individual = individual
-                if not user.individual2 and individual2:
-                    user.individual2 = individual2
-                if not user.telegram_link and telegram_link:
-                    user.telegram_link = telegram_link
-                if not user.instagram_link and instagram_link:
-                    user.instagram_link = instagram_link
-                if not user.twitter_link and twitter_link:
-                    user.twitter_link = twitter_link
-                if not user.vk_link and vk_link:
-                    user.vk_link = vk_link
-                if not user.facebook_link and facebook_link:
-                    user.facebook_link = facebook_link
-                if not user.linkedin_link and linkedin_link:
-                    user.linkedin_link = linkedin_link
-                if not user.whatsapp_link and whatsapp_link:
-                    user.whatsapp_link = whatsapp_link
-                if not user.counter and counter:
-                    user.counter = counter
-                if not user.feedback and feedback:
-                    user.feedback = feedback
+                if not company.name and name:
+                    company.name = name
+                if not company.country and country:
+                    company.country = country
+                if not company.email and email:
+                    company.email = email
+                if not company.individual and individual:
+                    company.individual = individual
+                if not company.individual2 and individual2:
+                    company.individual2 = individual2
+                if not company.telegram_link and telegram_link:
+                    company.telegram_link = telegram_link
+                if not company.instagram_link and instagram_link:
+                    company.instagram_link = instagram_link
+                if not company.twitter_link and twitter_link:
+                    company.twitter_link = twitter_link
+                if not company.vk_link and vk_link:
+                    company.vk_link = vk_link
+                if not company.facebook_link and facebook_link:
+                    company.facebook_link = facebook_link
+                if not company.linkedin_link and linkedin_link:
+                    company.linkedin_link = linkedin_link
+                if not company.whatsapp_link and whatsapp_link:
+                    company.whatsapp_link = whatsapp_link
+                if not company.counter and counter:
+                    company.counter = counter
+                if not company.feedback and feedback:
+                    company.feedback = feedback
 
-                user.save()
+                company.save()
 
         return redirect(reverse('admin:index'))
 
@@ -258,7 +258,7 @@ def upload_company_csv_file(request):
             counter = row['counter']
             feedback = row['feedback']
 
-            user, created = Company.objects.get_or_create(
+            company, created = Company.objects.get_or_create(
                 phone=phone,
                 defaults={
                     'name': name,
@@ -279,51 +279,51 @@ def upload_company_csv_file(request):
             )
 
             if not created:
-                if not user.name and name:
-                    user.name = name
-                if not user.country and country:
-                    user.country = country
-                if not user.email and email:
-                    user.email = email
-                if not user.individual and individual:
-                    user.individual = individual
-                if not user.individual2 and individual2:
-                    user.individual2 = individual2
-                if not user.telegram_link and telegram_link:
-                    user.telegram_link = telegram_link
-                if not user.instagram_link and instagram_link:
-                    user.instagram_link = instagram_link
-                if not user.twitter_link and twitter_link:
-                    user.twitter_link = twitter_link
-                if not user.vk_link and vk_link:
-                    user.vk_link = vk_link
-                if not user.facebook_link and facebook_link:
-                    user.facebook_link = facebook_link
-                if not user.linkedin_link and linkedin_link:
-                    user.linkedin_link = linkedin_link
-                if not user.whatsapp_link and whatsapp_link:
-                    user.whatsapp_link = whatsapp_link
-                if not user.counter and counter:
-                    user.counter = counter
-                if not user.feedback and feedback:
-                    user.feedback = feedback
+                if not company.name and name:
+                    company.name = name
+                if not company.country and country:
+                    company.country = country
+                if not company.email and email:
+                    company.email = email
+                if not company.individual and individual:
+                    company.individual = individual
+                if not company.individual2 and individual2:
+                    company.individual2 = individual2
+                if not company.telegram_link and telegram_link:
+                    company.telegram_link = telegram_link
+                if not company.instagram_link and instagram_link:
+                    company.instagram_link = instagram_link
+                if not company.twitter_link and twitter_link:
+                    company.twitter_link = twitter_link
+                if not company.vk_link and vk_link:
+                    company.vk_link = vk_link
+                if not company.facebook_link and facebook_link:
+                    company.facebook_link = facebook_link
+                if not company.linkedin_link and linkedin_link:
+                    company.linkedin_link = linkedin_link
+                if not company.whatsapp_link and whatsapp_link:
+                    company.whatsapp_link = whatsapp_link
+                if not company.counter and counter:
+                    company.counter = counter
+                if not company.feedback and feedback:
+                    company.feedback = feedback
 
-                user.save()
+                company.save()
 
         return redirect(reverse('admin:index'))
 
     return render(request, 'company_csv.html')
 
 
-def upload_user_csv_file(request):
+def upload_client_csv_file(request):
     if request.method == 'POST':
         if 'csv_file' not in request.FILES:
-            return render(request, 'user_csv.html', {'error': 'Файл не выбран'})
+            return render(request, 'client_csv.html', {'error': 'Файл не выбран'})
 
         csv_file = request.FILES['csv_file']
 
         if not csv_file.name.endswith('.csv'):
-            return render(request, 'user_csv.html')
+            return render(request, 'client_csv.html')
 
         try:
             df = pd.read_csv(csv_file, delimiter=',',
@@ -333,7 +333,7 @@ def upload_user_csv_file(request):
                              skiprows=1)
 
         except Exception as e:
-            return render(request, 'user_csv.html', {'error': f'Ошибка при чтении файла: {e}'})
+            return render(request, 'client_csv.html', {'error': f'Ошибка при чтении файла: {e}'})
 
         df.replace({np.nan: ''}, inplace=True)
 
@@ -353,7 +353,7 @@ def upload_user_csv_file(request):
             counter = row['counter']
             feedback = row['feedback']
 
-            user, created = User.objects.get_or_create(
+            client, created = Client.objects.get_or_create(
                 phone=phone,
                 defaults={
                     'name': name,
@@ -373,51 +373,51 @@ def upload_user_csv_file(request):
             )
 
             if not created:
-                if not user.name and name:
-                    user.name = name
-                if not user.country and country:
-                    user.country = country
-                if not user.email and email:
-                    user.email = email
-                if not user.login_bitmain and login_bitmain:
-                    user.login_bitmain = login_bitmain
-                if not user.telegram_link and telegram_link:
-                    user.telegram_link = telegram_link
-                if not user.instagram_link and instagram_link:
-                    user.instagram_link = instagram_link
-                if not user.twitter_link and twitter_link:
-                    user.twitter_link = twitter_link
-                if not user.vk_link and vk_link:
-                    user.vk_link = vk_link
-                if not user.facebook_link and facebook_link:
-                    user.facebook_link = facebook_link
-                if not user.linkedin_link and linkedin_link:
-                    user.linkedin_link = linkedin_link
-                if not user.whatsapp_link and whatsapp_link:
-                    user.whatsapp_link = whatsapp_link
-                if not user.counter and counter:
-                    user.counter = counter
-                if not user.feedback and feedback:
-                    user.feedback = feedback
+                if not client.name and name:
+                    client.name = name
+                if not client.country and country:
+                    client.country = country
+                if not client.email and email:
+                    client.email = email
+                if not client.login_bitmain and login_bitmain:
+                    client.login_bitmain = login_bitmain
+                if not client.telegram_link and telegram_link:
+                    client.telegram_link = telegram_link
+                if not client.instagram_link and instagram_link:
+                    client.instagram_link = instagram_link
+                if not client.twitter_link and twitter_link:
+                    client.twitter_link = twitter_link
+                if not client.vk_link and vk_link:
+                    client.vk_link = vk_link
+                if not client.facebook_link and facebook_link:
+                    client.facebook_link = facebook_link
+                if not client.linkedin_link and linkedin_link:
+                    client.linkedin_link = linkedin_link
+                if not client.whatsapp_link and whatsapp_link:
+                    client.whatsapp_link = whatsapp_link
+                if not client.counter and counter:
+                    client.counter = counter
+                if not client.feedback and feedback:
+                    client.feedback = feedback
 
-                user.save()
+                client.save()
 
         return redirect(reverse('admin:index'))
 
-    return render(request, 'user_csv.html')
+    return render(request, 'client_csv.html')
 
 
-class ProtectedViewUser(APIView):
+class ProtectedViewClient(APIView):
     permission_classes = [IsAuthenticated]
     http_method_names = ["get", "post"]
 
     def get(self, request):
-        users = User.objects.all()
-        serializer = UserSerializer(users, many=True)
+        clients = Client.objects.all()
+        serializer = ClientSerializer(clients, many=True)
         return Response(serializer.data)
 
     def post(self, request):
-        serializer = UserSerializer(data=request.data)
+        serializer = ClientSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
